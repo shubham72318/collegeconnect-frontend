@@ -40,6 +40,9 @@ const Signup = () => {
         data: {
           full_name: name,
           role: role,
+          // Used by the Supabase `handle_new_user()` trigger to populate `profiles`.
+          company_name: role === "company" ? name : null,
+          college_name: role === "college" ? name : null,
         },
         emailRedirectTo: window.location.origin,
       },
