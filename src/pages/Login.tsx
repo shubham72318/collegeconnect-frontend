@@ -5,8 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const Login = () => {
   const [searchParams] = useSearchParams();
@@ -15,29 +16,36 @@ const Login = () => {
   const [role, setRole] = useState(defaultRole);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Mock authentication
-    if (email && password) {
-      toast.success("Login successful!");
-      
-      // Navigate to respective dashboard
-      switch (role) {
-        case "college":
-          navigate("/college/dashboard");
-          break;
-        case "company":
-          navigate("/company/dashboard");
-          break;
-        case "student":
-          navigate("/student/dashboard");
-          break;
-      }
-    } else {
-      toast.error("Please fill in all fields");
+    setLoading(true);
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      toast.error(error.message);
+      setLoading(false);
+      return;
     }
+
+    if (data.user) {
+      // Fetch profile to get role
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("user_id", data.user.id)
+        .single();
+
+      toast.success("Login successful!");
+      const userRole = profile?.role || role;
+      navigate(`/${userRole}/dashboard`);
+    }
+    setLoading(false);
   };
 
   const getRoleColor = () => {
@@ -107,13 +115,14 @@ const Login = () => {
             </div>
             <Button 
               type="submit" 
+              disabled={loading}
               className={`w-full ${
                 role === "college" ? "bg-blue-600 hover:bg-blue-700" :
                 role === "company" ? "bg-green-600 hover:bg-green-700" :
                 "bg-purple-600 hover:bg-purple-700"
               }`}
             >
-              Sign In
+              {loading ? "Signing in..." : "Sign In"}
             </Button>
           </form>
 
