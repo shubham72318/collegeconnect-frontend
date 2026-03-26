@@ -5,8 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -15,8 +16,9 @@ const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSignup = (e: React.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (password !== confirmPassword) {
@@ -24,12 +26,34 @@ const Signup = () => {
       return;
     }
 
-    if (name && email && password) {
-      toast.success("Account created successfully!");
-      navigate("/login?role=" + role);
-    } else {
-      toast.error("Please fill in all fields");
+    if (password.length < 6) {
+      toast.error("Password must be at least 6 characters");
+      return;
     }
+
+    setLoading(true);
+
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          full_name: name,
+          role: role,
+        },
+        emailRedirectTo: window.location.origin,
+      },
+    });
+
+    if (error) {
+      toast.error(error.message);
+      setLoading(false);
+      return;
+    }
+
+    toast.success("Account created! Please check your email to verify your account.");
+    navigate("/login?role=" + role);
+    setLoading(false);
   };
 
   const getRoleColor = () => {
@@ -125,13 +149,14 @@ const Signup = () => {
             </div>
             <Button 
               type="submit" 
+              disabled={loading}
               className={`w-full ${
                 role === "college" ? "bg-blue-600 hover:bg-blue-700" :
                 role === "company" ? "bg-green-600 hover:bg-green-700" :
                 "bg-purple-600 hover:bg-purple-700"
               }`}
             >
-              Create Account
+              {loading ? "Creating Account..." : "Create Account"}
             </Button>
           </form>
 
