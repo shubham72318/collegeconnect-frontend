@@ -14,6 +14,109 @@ export type Database = {
   }
   public: {
     Tables: {
+      applications: {
+        Row: {
+          college_name: string | null
+          created_at: string
+          drive_id: string
+          id: string
+          status: string
+          student_name: string | null
+          student_user_id: string
+        }
+        Insert: {
+          college_name?: string | null
+          created_at?: string
+          drive_id: string
+          id?: string
+          status?: string
+          student_name?: string | null
+          student_user_id: string
+        }
+        Update: {
+          college_name?: string | null
+          created_at?: string
+          drive_id?: string
+          id?: string
+          status?: string
+          student_name?: string | null
+          student_user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "applications_drive_id_fkey"
+            columns: ["drive_id"]
+            isOneToOne: false
+            referencedRelation: "drives"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      drive_college_approvals: {
+        Row: {
+          college_name: string
+          college_user_id: string
+          created_at: string
+          drive_id: string
+          id: string
+          status: string
+        }
+        Insert: {
+          college_name: string
+          college_user_id: string
+          created_at?: string
+          drive_id: string
+          id?: string
+          status: string
+        }
+        Update: {
+          college_name?: string
+          college_user_id?: string
+          created_at?: string
+          drive_id?: string
+          id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "drive_college_approvals_drive_id_fkey"
+            columns: ["drive_id"]
+            isOneToOne: false
+            referencedRelation: "drives"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      drives: {
+        Row: {
+          company_name: string
+          company_user_id: string
+          created_at: string
+          id: string
+          package: string
+          vacancies: number
+          visit_date: string
+        }
+        Insert: {
+          company_name: string
+          company_user_id: string
+          created_at?: string
+          id?: string
+          package: string
+          vacancies?: number
+          visit_date: string
+        }
+        Update: {
+          company_name?: string
+          company_user_id?: string
+          created_at?: string
+          id?: string
+          package?: string
+          vacancies?: number
+          visit_date?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
