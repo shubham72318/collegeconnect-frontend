@@ -1,0 +1,1 @@
+ALTER TABLE public.applications RENAME COLUMN college_name TO student_college_name;

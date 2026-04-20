@@ -16,29 +16,29 @@ export type Database = {
     Tables: {
       applications: {
         Row: {
-          college_name: string | null
           created_at: string
           drive_id: string
           id: string
           status: string
+          student_college_name: string | null
           student_name: string | null
           student_user_id: string
         }
         Insert: {
-          college_name?: string | null
           created_at?: string
           drive_id: string
           id?: string
           status?: string
+          student_college_name?: string | null
           student_name?: string | null
           student_user_id: string
         }
         Update: {
-          college_name?: string | null
           created_at?: string
           drive_id?: string
           id?: string
           status?: string
+          student_college_name?: string | null
           student_name?: string | null
           student_user_id?: string
         }
